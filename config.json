@@ -1,0 +1,8 @@
+{
+    "inputDir": "input",
+    "outputDir": "output",
+    "rowsPerFile": 100000,
+    "fieldMappingFile": "field_mapping.json",
+    "chatGptApiKey": "sk-xxxxxxxxxxx"
+  }
+  
