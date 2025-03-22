@@ -1,5 +1,5 @@
 // ------------------------------------------------------------
-// CSV & XLSX MASTER MERGER WITH CHATGPT FIELD MAPPING
+// CSV & XLSX MASTER MERGER WITH CHATGPT FIELD MAPPING + DATA CLEANSING
 // ------------------------------------------------------------
 
 const fs = require('fs-extra');
@@ -123,7 +123,25 @@ const generateFieldMapping = async (fieldsArray) => {
 };
 
 // ------------------------------------------------------------
-// STEP 3: Normalize rows using mapping
+// STEP 3: Data Cleansing Function (Core for all rows)
+// ------------------------------------------------------------
+const cleanseValue = (value) => {
+  if (typeof value !== 'string') value = String(value || '');
+
+  // Replace unwanted characters (emoji, special chars, etc.)
+  let cleaned = value
+    .replace(/[^\x20-\x7E]/g, '')   // Remove non-printable/non-ASCII
+    .replace(/[^a-zA-Z0-9\s@.\-_,]/g, '') // Keep alphanumeric and basic punctuation
+    .trim();
+
+  // Optional normalization (e.g., converting smart quotes, dashes, etc.)
+  cleaned = cleaned.normalize("NFKC");
+
+  return cleaned;
+};
+
+// ------------------------------------------------------------
+// STEP 4: Normalize and Cleanse Rows
 // ------------------------------------------------------------
 const createReverseMap = (fieldMapping) => {
   const reverseMap = {};
@@ -144,8 +162,11 @@ const normalizeRow = (row, masterFieldArray, reverseMap) => {
   Object.keys(row).forEach(originalKey => {
     const cleanedKey = originalKey.trim().toLowerCase();
     const mappedField = reverseMap[cleanedKey];
+
     if (mappedField) {
-      normalized[mappedField] = row[originalKey];
+      const rawValue = row[originalKey];
+      const cleanedValue = cleanseValue(rawValue);
+      normalized[mappedField] = cleanedValue;
     }
   });
 
@@ -153,7 +174,7 @@ const normalizeRow = (row, masterFieldArray, reverseMap) => {
 };
 
 // ------------------------------------------------------------
-// STEP 4: Process ALL FILES and Create Master CSVs
+// STEP 5: Process ALL FILES and Create Master CSVs
 // ------------------------------------------------------------
 const processAndCreateMasters = async (fieldMapping) => {
   try {
@@ -164,7 +185,7 @@ const processAndCreateMasters = async (fieldMapping) => {
     let masterData = [];
     let fileCount = 1;
 
-    console.log('\n⚙️ Starting full data processing...\n');
+    console.log('\n⚙️ Starting full data processing with data cleansing...\n');
 
     for (const file of files) {
       const ext = path.extname(file).toLowerCase();
@@ -206,7 +227,7 @@ const processAndCreateMasters = async (fieldMapping) => {
 };
 
 // ------------------------------------------------------------
-// STEP 5: Write Master CSVs to Output Directory
+// STEP 6: Write Master CSVs to Output Directory
 // ------------------------------------------------------------
 const writeToCSV = (data, count, masterFieldArray) => {
   const outputFile = path.join(OUTPUT_DIR, `master_file_${count}.csv`);
@@ -221,7 +242,7 @@ const writeToCSV = (data, count, masterFieldArray) => {
 // MAIN FUNCTION: Run the process
 // ------------------------------------------------------------
 const run = async () => {
-  console.log('🚀 Starting CSV & XLSX Master Merger Process...\n');
+  console.log('🚀 Starting CSV & XLSX Master Merger Process with Cleansing...\n');
 
   const fields = await collectUniqueFields();
 

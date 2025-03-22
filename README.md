@@ -1,24 +1,29 @@
 
-# 📂 CSV/XLSX Master Merger with GPT-Powered Field Mapping
+# 📂 CSV/XLSX Master Merger with GPT-Powered Field Mapping + Data Cleansing
 
-🚀 **CSV/XLSX Master Merger** is a Node.js-based application designed to simplify merging thousands of CSV and Excel files (XLSX/XLSM). It leverages GPT to intelligently unify inconsistent column headers across files—whether they have more fields, fewer fields, or entirely mismatched names.
+🚀 **CSV/XLSX Master Merger** is a Node.js-based application that simplifies the process of merging thousands of CSV and Excel files (XLSX/XLSM). It leverages GPT-powered field mapping to intelligently unify inconsistent column headers and includes a robust **data cleansing layer** to ensure your merged datasets are clean, consistent, and ready for downstream processing or analysis.
 
 ---
 
 ## ✨ Key Features
-- 🔍 **Auto-detects unique column headers** across all files (even if some files are incomplete or inconsistent).
-- 🤖 **GPT-powered field mapping** to group and normalize similar columns, regardless of header names.
-- 🗂️ Supports **CSV, XLSX, and XLSM** formats.
-- 📁 **Merges** into master CSV files (split after 100,000 rows per file for better manageability).
-- ⚡ **Efficient handling** of large datasets with streamlined batching.
-- 💡 Easy-to-configure via `config.json`.
+- 🔍 **Auto-detects unique column headers** across all files (even when headers vary or are incomplete).
+- 🤖 **GPT-powered field mapping** groups and normalizes similar columns, regardless of inconsistent naming.
+- 🗂️ Supports **CSV, XLSX, and XLSM** file formats.
+- 🧹 **Advanced data cleansing** to sanitize and normalize data at the row level:
+  - Removes special characters and unknown symbols.
+  - Trims unnecessary white spaces.
+  - Handles `null`, `undefined`, or missing values.
+  - Normalizes character encoding to avoid data corruption.
+- 📁 **Merges** data into master CSV files (splits automatically after 100,000 rows for optimal performance).
+- ⚡ **Efficient handling** of large datasets with optimized batching.
+- 💡 Easy configuration using `config.json`.
 
 ---
 
 ## 📝 Example Use Case
 
 ### 🎯 The Problem  
-You have **multiple files**, each with different column combinations:
+You have **multiple files**, each with different column combinations and inconsistent data:
 
 #### 📄 File 1
 | Name   | Email           | Contact      |
@@ -38,12 +43,12 @@ You have **multiple files**, each with different column combinations:
 ---
 
 ### ✅ What the Script Does
-1. **Detects all unique headers** from these files:
+1. **Scans and detects all unique headers** from these files:
    ```
    ["Name", "Email", "Contact", "Mobile", "Pincode", "FatherName"]
    ```
 
-2. **Sends them to GPT**, which intelligently groups similar fields and creates a mapping:
+2. **Uses GPT** to generate a smart mapping of similar fields:
    ```json
    {
      "Name": ["Name"],
@@ -54,7 +59,13 @@ You have **multiple files**, each with different column combinations:
    }
    ```
 
-3. **Creates a master dataset**, filling missing values as needed, under a unified structure:
+3. **Cleans and normalizes the row data**:
+   - Strips unwanted characters (emoji, special symbols).
+   - Trims spaces and unnecessary whitespace.
+   - Converts inconsistent encodings.
+   - Ensures empty fields are consistently represented.
+
+4. **Creates a master dataset** with uniform columns and clean data:
 
 | Name  | Email           | Phone/Mobile | Pincode | Father Name |
 |-------|-----------------|--------------|---------|-------------|
@@ -65,13 +76,28 @@ You have **multiple files**, each with different column combinations:
 ---
 
 ### 📂 Output Files
-You'll find the merged master files in `/output`:
+Once processed, the merged and cleansed master files are saved in `/output`:
 ```
 output/
 ├── master_file_1.csv
 ├── master_file_2.csv (if row count exceeds 100,000)
 └── ...
 ```
+
+---
+
+## 🧹 Data Cleansing Process (Explained)
+Our data cleansing layer runs **before writing to the master CSV**. Here's what it does for every cell in every row:
+
+1. ✅ **Trims whitespace** (no more leading or trailing spaces).
+2. ✅ **Removes unknown/special characters**:
+   - Filters out non-printable, non-standard ASCII characters.
+   - Keeps only alphanumeric, standard punctuation (e.g., dots, hyphens, underscores).
+3. ✅ **Handles null/undefined**:
+   - Converts `null`, `undefined`, and other junk values into empty fields.
+4. ✅ **Normalizes encoding**:
+   - Converts text to a standard format (Unicode NFKC) to prevent broken characters.
+5. ✅ **Ensures clean, consistent data** across your entire dataset, making it ready for downstream systems (analytics, databases, etc.).
 
 ---
 
@@ -85,7 +111,7 @@ node index.js
 
 ## ⚙️ Configuration (`config.json`)
 
-Customize according to your needs:
+You can customize the script via `config.json`:
 
 ```json
 {
@@ -118,22 +144,22 @@ Customize according to your needs:
    ```
 
 3. **Prepare your data**
-   - Place all CSV/XLSX files inside the `/input` folder.
+   - Place all CSV/XLSX/XLSM files inside the `/input` folder.
 
-4. **Configure**
-   - Edit `config.json` and add your API key.
+4. **Configure the settings**
+   - Update `config.json` with your OpenAI GPT API key and file preferences.
 
 ---
 
 ## 🔐 API Key Security Tips
-- Always keep your OpenAI `chatGptApiKey` private.
-- For production, store sensitive keys in environment variables.
+- Keep your OpenAI `chatGptApiKey` private and secure.
+- In production, store sensitive data in environment variables or secret managers.
 
 ---
 
 ## 🙌 Contributing
 1. Fork the repo.
-2. Create a feature branch:
+2. Create your feature branch:
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -148,10 +174,10 @@ Customize according to your needs:
 ## ❓ FAQ
 
 ### ✅ What GPT model is used?
-- Defaults to GPT-4, but you can switch to GPT-3.5 in the config.
+- GPT-4 by default, but GPT-3.5 can be selected in `config.json`.
 
 ### ✅ Can it handle thousands of files?
-- Yes! It processes large datasets efficiently.
+- Absolutely! The app batches and processes large datasets efficiently.
 
 ### ✅ What formats are supported?
 - CSV, XLSX, XLSM.
@@ -160,8 +186,9 @@ Customize according to your needs:
 
 ## 🚀 Roadmap / Upcoming Features
 - CLI progress indicators.
-- Streaming support for large files.
-- More file formats (JSON, XML).
+- Streaming support for very large files.
+- Support for additional formats like JSON and XML.
+- Direct database export (MySQL/PostgreSQL).
 
 ---
 
