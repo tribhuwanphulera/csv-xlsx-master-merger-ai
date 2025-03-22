@@ -15,16 +15,70 @@
 
 ---
 
-## 📁 Folder Structure
+## 📝 Example Use Case
 
+### 🎯 The Problem  
+You have **multiple files**, each with different column combinations:
+
+#### 📄 File 1
+| Name   | Email           | Contact      |
+|--------|-----------------|--------------|
+| John   | john@email.com  | 9876543210   |
+
+#### 📄 File 2
+| Name   | Mobile        | Pincode |
+|--------|---------------|---------|
+| Alice  | 1234567890    | 110001  |
+
+#### 📄 File 3
+| Name   | Email            | FatherName | Mobile       |
+|--------|------------------|------------|--------------|
+| Bob    | bob@abc.com      | Robert     | 9988776655   |
+
+---
+
+### ✅ What the Script Does
+1. **Detects all unique headers** from these files:
+   ```
+   ["Name", "Email", "Contact", "Mobile", "Pincode", "FatherName"]
+   ```
+
+2. **Sends them to GPT**, which intelligently groups similar fields and creates a mapping:
+   ```json
+   {
+     "Name": ["Name"],
+     "Email": ["Email"],
+     "Phone/Mobile": ["Contact", "Mobile"],
+     "Pincode": ["Pincode"],
+     "Father Name": ["FatherName"]
+   }
+   ```
+
+3. **Creates a master dataset**, filling missing values as needed, under a unified structure:
+
+| Name  | Email           | Phone/Mobile | Pincode | Father Name |
+|-------|-----------------|--------------|---------|-------------|
+| John  | john@email.com  | 9876543210   |         |             |
+| Alice |                 | 1234567890   | 110001  |             |
+| Bob   | bob@abc.com     | 9988776655   |         | Robert      |
+
+---
+
+### 📂 Output Files
+You'll find the merged master files in `/output`:
 ```
-csv-xlsx-master-merger-ai/
-├── input/               # Put your source files here (CSV/XLSX/XLSM)
-├── output/              # Merged master CSVs will be saved here
-├── config.json          # Configuration file for customizing inputs/outputs
-├── index.js             # Main script (entry point)
-├── package.json         # Node.js dependencies
-└── node_modules/        # Installed packages (auto-generated)
+output/
+├── master_file_1.csv
+├── master_file_2.csv (if row count exceeds 100,000)
+└── ...
+```
+
+---
+
+## 🚀 How to Run the Script
+
+```bash
+node index.js
 ```
 
 ---
@@ -65,74 +119,9 @@ Customize according to your needs:
 
 3. **Prepare your data**
    - Place all CSV/XLSX files inside the `/input` folder.
-   - Ensure they are named appropriately.
 
 4. **Configure**
    - Edit `config.json` and add your API key.
-   - Adjust other options (e.g., `rowsPerFile`).
-
----
-
-## 🚀 How to Run the Script
-
-```bash
-node index.js
-```
-
----
-
-## 📝 Example Use Case
-
-### 🎯 The Problem
-You have **three files** with mismatched column headers, missing fields, or extra columns:
-
-| name   | email           | phone      |
-|--------|-----------------|------------|
-| John   | john@email.com  | 9876543210 |
-
-| Name   | Email Address    | Contact    |
-|--------|------------------|------------|
-| Alice  | alice@mail.com   | 1234567890 |
-
-| Full Name | Email         | Mobile Number |
-|-----------|---------------|---------------|
-| Bob       | bob@abc.com   | 1122334455    |
-
----
-
-### ✅ What the Script Does
-1. **Detects all unique headers**, even if some files are missing columns or have extras:
-   ```
-   ["name", "email", "phone", "Name", "Email Address", "Contact", "Full Name", "Mobile Number"]
-   ```
-
-2. **Sends them to GPT**, which intelligently groups and maps them:
-   ```json
-   {
-     "Name": ["name", "Name", "Full Name"],
-     "Email": ["email", "Email Address"],
-     "Phone": ["phone", "Contact", "Mobile Number"]
-   }
-   ```
-
-3. **Creates a master dataset**, normalizing all rows under a unified structure:
-
-| Name  | Email           | Phone       |
-|-------|-----------------|-------------|
-| John  | john@email.com  | 9876543210  |
-| Alice | alice@mail.com  | 1234567890  |
-| Bob   | bob@abc.com     | 1122334455  |
-
----
-
-### 📂 Output Files
-You'll find the merged master files in `/output`:
-```
-output/
-├── master_file_1.csv
-├── master_file_2.csv (if row count exceeds 100,000)
-└── ...
-```
 
 ---
 
@@ -156,13 +145,13 @@ output/
 
 ---
 
-## ❓ Frequently Asked Questions (FAQ)
+## ❓ FAQ
 
 ### ✅ What GPT model is used?
-- Defaults to GPT-4, but you can switch to GPT-3.5 in the config for cost savings.
+- Defaults to GPT-4, but you can switch to GPT-3.5 in the config.
 
 ### ✅ Can it handle thousands of files?
-- Yes! It processes large datasets in batches and splits files based on row limits.
+- Yes! It processes large datasets efficiently.
 
 ### ✅ What formats are supported?
 - CSV, XLSX, XLSM.
@@ -170,9 +159,9 @@ output/
 ---
 
 ## 🚀 Roadmap / Upcoming Features
-- Add CLI progress indicators.
-- Streaming support for ultra-large files.
-- Support for additional formats like JSON and XML.
+- CLI progress indicators.
+- Streaming support for large files.
+- More file formats (JSON, XML).
 
 ---
 
