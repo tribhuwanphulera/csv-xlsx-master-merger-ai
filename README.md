@@ -1,38 +1,37 @@
 
-# 📂 CSV/XLSX Master Merger with GPT Field Mapping
+# 📂 CSV/XLSX Master Merger with GPT-Powered Field Mapping
 
-🚀 **CSV/XLSX Master Merger** is a Node.js application that automates merging thousands of CSV/XLSX files into standardized master datasets, utilizing GPT-powered field mapping for dynamic column unification and normalization.
-
----
-
-## ✨ Features
-- 🔍 Automatically detects unique field names from all files.
-- 🤖 GPT-powered field mapping (GPT-4 or GPT-3.5) for grouping similar columns.
-- 🛠️ Supports CSV, XLSX, and XLSM formats.
-- 📁 Merges data into standardized master CSV files (with up to 1 lakh/100,000 rows per file).
-- ⚡ Handles large datasets efficiently.
-- 💡 Easy to configure using `config.json`.
+🚀 **CSV/XLSX Master Merger** is a Node.js-based application designed to simplify merging thousands of CSV and Excel files (XLSX/XLSM). It leverages GPT to intelligently unify inconsistent column headers across files—whether they have more fields, fewer fields, or entirely mismatched names.
 
 ---
 
-## 📁 Project Structure
+## ✨ Key Features
+- 🔍 **Auto-detects unique column headers** across all files (even if some files are incomplete or inconsistent).
+- 🤖 **GPT-powered field mapping** to group and normalize similar columns, regardless of header names.
+- 🗂️ Supports **CSV, XLSX, and XLSM** formats.
+- 📁 **Merges** into master CSV files (split after 100,000 rows per file for better manageability).
+- ⚡ **Efficient handling** of large datasets with streamlined batching.
+- 💡 Easy-to-configure via `config.json`.
+
+---
+
+## 📁 Folder Structure
 
 ```
 csv-xlsx-master-merger-ai/
-├── input/               # 📂 Your source files (CSV/XLSX)
-├── output/              # 📂 Output directory for merged master files
-├── config.json          # ⚙️ Configuration file
-├── index.js             # 🚀 Main script
-├── package.json         # 📦 Node.js dependencies
-├── package-lock.json    # 🔒 Dependency lock file
-└── node_modules/        # 📦 Installed dependencies
+├── input/               # Put your source files here (CSV/XLSX/XLSM)
+├── output/              # Merged master CSVs will be saved here
+├── config.json          # Configuration file for customizing inputs/outputs
+├── index.js             # Main script (entry point)
+├── package.json         # Node.js dependencies
+└── node_modules/        # Installed packages (auto-generated)
 ```
 
 ---
 
 ## ⚙️ Configuration (`config.json`)
 
-Edit `config.json` to customize your paths, limits, and API key:
+Customize according to your needs:
 
 ```json
 {
@@ -40,48 +39,52 @@ Edit `config.json` to customize your paths, limits, and API key:
   "outputDir": "output",
   "rowsPerFile": 100000,
   "fieldMappingFile": "field_mapping.json",
-  "chatGptApiKey": "sk-xxxxxx"
+  "chatGptApiKey": "sk-your-openai-key"
 }
 ```
 
 ---
 
-## 🛠️ Setup & Installation
+## 🛠️ Installation & Setup
 
 ### Prerequisites
-- ✅ Node.js v16+
-- ✅ An OpenAI GPT API Key
+- ✅ Node.js (version 16 or higher)
+- ✅ OpenAI GPT API Key (GPT-4 or GPT-3.5)
 
 ### Installation Steps
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
    git clone https://github.com/tribhuwanphulera/csv-xlsx-master-merger-ai.git
    cd csv-xlsx-master-merger-ai
    ```
 
-2. Install the dependencies:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-3. Place your input files inside the `/input` folder.
+3. **Prepare your data**
+   - Place all CSV/XLSX files inside the `/input` folder.
+   - Ensure they are named appropriately.
 
-4. Configure your `config.json` file with the appropriate values.
+4. **Configure**
+   - Edit `config.json` and add your API key.
+   - Adjust other options (e.g., `rowsPerFile`).
 
 ---
 
-## 🚀 How to Run
-Simply execute the script:
+## 🚀 How to Run the Script
+
 ```bash
 node index.js
 ```
 
 ---
 
-## 📝 Example Workflow
+## 📝 Example Use Case
 
-### 🎯 Problem
-You have 3 files with inconsistent column headers:
+### 🎯 The Problem
+You have **three files** with mismatched column headers, missing fields, or extra columns:
 
 | name   | email           | phone      |
 |--------|-----------------|------------|
@@ -91,28 +94,28 @@ You have 3 files with inconsistent column headers:
 |--------|------------------|------------|
 | Alice  | alice@mail.com   | 1234567890 |
 
-| Full Name | Email  | Mobile Number |
-|-----------|--------|---------------|
-| Bob       | bob@abc.com | 1122334455 |
+| Full Name | Email         | Mobile Number |
+|-----------|---------------|---------------|
+| Bob       | bob@abc.com   | 1122334455    |
 
 ---
 
-### 🤖 What Happens
-1. The script **detects** all unique columns:
-```
-["name", "email", "phone", "Name", "Email Address", "Contact", "Full Name", "Mobile Number"]
-```
+### ✅ What the Script Does
+1. **Detects all unique headers**, even if some files are missing columns or have extras:
+   ```
+   ["name", "email", "phone", "Name", "Email Address", "Contact", "Full Name", "Mobile Number"]
+   ```
 
-2. Sends them to **ChatGPT API**, which returns a mapping:
-```json
-{
-  "Name": ["name", "Name", "Full Name"],
-  "Email": ["email", "Email Address"],
-  "Phone": ["phone", "Contact", "Mobile Number"]
-}
-```
+2. **Sends them to GPT**, which intelligently groups and maps them:
+   ```json
+   {
+     "Name": ["name", "Name", "Full Name"],
+     "Email": ["email", "Email Address"],
+     "Phone": ["phone", "Contact", "Mobile Number"]
+   }
+   ```
 
-3. The script **normalizes** and merges them into a unified CSV:
+3. **Creates a master dataset**, normalizing all rows under a unified structure:
 
 | Name  | Email           | Phone       |
 |-------|-----------------|-------------|
@@ -123,58 +126,58 @@ You have 3 files with inconsistent column headers:
 ---
 
 ### 📂 Output Files
-After processing, you will find master files in `/output`:
+You'll find the merged master files in `/output`:
 ```
 output/
 ├── master_file_1.csv
-├── master_file_2.csv (if rows exceed 100,000)
+├── master_file_2.csv (if row count exceeds 100,000)
 └── ...
 ```
 
 ---
 
-## 🛡️ API Security
-- Keep your OpenAI `chatGptApiKey` private!
-- Recommended: Use environment variables for sensitive data in production.
+## 🔐 API Key Security Tips
+- Always keep your OpenAI `chatGptApiKey` private.
+- For production, store sensitive keys in environment variables.
 
 ---
 
-## 🙌 Contributions Welcome!
-1. Fork the project.
-2. Create your feature branch:
+## 🙌 Contributing
+1. Fork the repo.
+2. Create a feature branch:
    ```bash
-   git checkout -b feature/new-feature
+   git checkout -b feature/your-feature-name
    ```
-3. Commit changes:
+3. Commit your changes:
    ```bash
-   git commit -m "Add new feature"
+   git commit -m "Added new feature"
    ```
 4. Push and create a Pull Request.
 
 ---
 
-## ❓ FAQ
+## ❓ Frequently Asked Questions (FAQ)
 
-### What GPT model is used?
-- GPT-4 by default (you can switch to GPT-3.5 for lower cost).
+### ✅ What GPT model is used?
+- Defaults to GPT-4, but you can switch to GPT-3.5 in the config for cost savings.
 
-### Can it handle thousands of files?
-- Yes! It batches records efficiently and writes in chunks.
+### ✅ Can it handle thousands of files?
+- Yes! It processes large datasets in batches and splits files based on row limits.
 
-### What formats are supported?
+### ✅ What formats are supported?
 - CSV, XLSX, XLSM.
 
 ---
 
-## 🚀 Roadmap / Future Ideas
+## 🚀 Roadmap / Upcoming Features
 - Add CLI progress indicators.
-- Streaming support for massive files.
-- More file format support (JSON, XML).
+- Streaming support for ultra-large files.
+- Support for additional formats like JSON and XML.
 
 ---
 
 ## 📜 License
-MIT License
+MIT License.
 
 ---
 
